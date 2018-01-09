@@ -33,10 +33,14 @@ sub _process_module {
         _raw=>1,
     );
 
-    $self->add_text_to_section(
-        $document, $res->{list}, 'INCLUDED MODULES',
-        {after_section => ['DESCRIPTION']},
-    ) if $res->{list};
+    for my $section (sort keys %{$res->{pod}}) {
+        $self->add_text_to_section(
+            $document, $res->{pod}{$section}, $section,
+            {
+                (after_section => ['DESCRIPTION']) x ($section ne 'DESCRIPTION')
+            },
+        );
+    }
 
     # XXX don't add if current See Also already mentions it
     my @pod = (
