@@ -61,12 +61,11 @@ sub weave_section {
 
     my $filename = $input->{filename};
 
-    my $package;
-    if ($filename =~ m!^lib/(.+)\.pm$!) {
-        $package = $1;
-        $package =~ s!/!::!g;
-        $self->_process_module($document, $input, $package);
-    }
+    return unless $filename =~ m!^lib/(.+)\.pm$!;
+    my $package = $1;
+    $package =~ s!/!::!g;
+    return unless $package =~ /\AAcme::CPANModules::/;
+    $self->_process_module($document, $input, $package);
 }
 
 1;
