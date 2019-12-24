@@ -30,6 +30,16 @@ sub _process_module {
         require $package_pm;
     }
 
+    my $list = ${"$package\::LIST"};
+    my $has_benchmark = 0;
+  L1:
+    for my $entry (@{ $list->{entries} }) {
+        if (grep {/^bench_/} keys %$entry) {
+            $has_benchmark = 1;
+            last L1;
+        }
+    }
+
     (my $ac_name = $package) =~ s/\AAcme::CPANModules:://;
 
     my $res = gen_pod_from_acme_cpanmodules(
@@ -73,9 +83,9 @@ or L<Acme::CM::Get>:
     % perl -MAcme::CM::Get=).$ac_name.q( -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
 );
-        if () {
+        if ($has_benchmark) {
             push @pod,
-q(This module contains benchmark instructions. You can produce run a benchmark
+q(This module contains benchmark instructions. You can run a benchmark
 for some/all the modules listed in this Acme::CPANModules module using
 L<bencher>:
 
