@@ -1,6 +1,8 @@
 package Pod::Weaver::Plugin::Acme::CPANModules;
 
+# AUTHORITY
 # DATE
+# DIST
 # VERSION
 
 use 5.010001;
@@ -28,6 +30,8 @@ sub _process_module {
         require $package_pm;
     }
 
+    (my $ac_name = $package) =~ s/\AAcme::CPANModules:://;
+
     my $res = gen_pod_from_acme_cpanmodules(
         module => $package,
         _raw=>1,
@@ -52,6 +56,48 @@ sub _process_module {
         {after_section => ['DESCRIPTION']
      },
     );
+
+    # add FAQ section
+    {
+        my @pod;
+        push @pod,
+q(=head2 What are ways to use this module?
+
+Aside from reading it, you can install all the listed modules using
+L<cpanmodules>:
+
+    % cpanmodules ls-entries ).$ac_name.q( | cpanm -n
+
+or L<Acme::CM::Get>:
+
+    % perl -MAcme::CM::Get=).$ac_name.q( -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+);
+        if () {
+            push @pod,
+q(This module contains benchmark instructions. You can produce run a benchmark
+for some/all the modules listed in this Acme::CPANModules module using
+L<bencher>:
+
+    % bencher --cpanmodules-module ).$ac_name.q(
+
+);
+        }
+
+        push @pod,
+q(This module also helps L<lcpan> produce a more meaningful result for C<lcpan
+related-mods> when it comes to finding related modules for the modules listed
+in this Acme::CPANModules module.
+
+);
+        $self->add_text_to_section(
+            $document, join("", @pod), 'FAQ',
+            {
+                after_section => ['COMPLETION', 'DESCRIPTION'],
+                before_section => ['CONFIGURATION FILE', 'CONFIGURATION FILES'],
+                ignore => 1,
+            });
+    }
 
     $self->log(["Generated POD for '%s'", $filename]);
 }
