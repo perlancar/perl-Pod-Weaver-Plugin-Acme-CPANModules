@@ -143,7 +143,7 @@ currently does the following:
 
 =over
 
-=item * Create "INCLUDED MODULES" POD section from the list
+=item * Create "MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE" POD section from the list
 
 =item * Mention some modules in See Also section
 
