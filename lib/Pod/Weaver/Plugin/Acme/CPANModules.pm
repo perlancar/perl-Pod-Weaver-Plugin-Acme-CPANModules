@@ -71,10 +71,11 @@ sub _process_module {
     {
         my @pod;
         push @pod,
-q(=head2 What are ways to use this module?
+q(=head2 What are ways to use this Acme::CPANModules module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanmodules> CLI (from
+L<App::cpanmodules> distribution):
 
     % cpanmodules ls-entries ).$ac_name.q( | cpanm -n
 
@@ -82,12 +83,16 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=).$ac_name.q( -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
+or directly:
+
+    % perl -MAcme::CPANModules::).$ac_name.q( -E'say $_->{module} for @{ $Acme::CPANModules::).$ac_name.q(::LIST->{entries} }' | cpanm -n
+
 );
         if ($has_benchmark) {
             push @pod,
-q(This module contains benchmark instructions. You can run a benchmark
-for some/all the modules listed in this Acme::CPANModules module using
-L<bencher>:
+q(This Acme::CPANModules module contains benchmark instructions. You can run a
+benchmark for some/all the modules listed in this Acme::CPANModules module using
+the L<bencher> CLI (from L<Bencher> distribution):
 
     % bencher --cpanmodules-module ).$ac_name.q(
 
@@ -95,9 +100,9 @@ L<bencher>:
         }
 
         push @pod,
-q(This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+q(This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
 
 );
         $self->add_text_to_section(
