@@ -71,7 +71,13 @@ sub _process_module {
     {
         my @pod;
         push @pod,
-q(=head2 What are ways to use this Acme::CPANModules module?
+q(=head2 What is an Acme::CPANModules::* module?
+
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
 
 Aside from reading this Acme::CPANModules module's POD documentation, you can
 install all the listed modules (entries) using L<cpanmodules> CLI (from
