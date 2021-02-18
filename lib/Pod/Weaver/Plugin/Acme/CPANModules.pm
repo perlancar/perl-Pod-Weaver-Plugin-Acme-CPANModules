@@ -10,6 +10,8 @@ use Moose;
 with 'Pod::Weaver::Role::AddTextToSection';
 with 'Pod::Weaver::Role::Section';
 
+has entry_description_code => (is=>'rw');
+
 use Pod::From::Acme::CPANModules qw(gen_pod_from_acme_cpanmodules);
 
 sub _process_module {
@@ -45,6 +47,7 @@ sub _process_module {
     my $res = gen_pod_from_acme_cpanmodules(
         module => $package,
         _raw=>1,
+        ($self->entry_description_code ? (entry_description_code => $self->entry_description_code) : ()),
     );
 
     for my $section (sort keys %{$res->{pod}}) {
@@ -145,6 +148,7 @@ sub weave_section {
 In your F<weaver.ini>:
 
  [-Acme::CPANModules]
+ ;entry_description_code = "Website URL: <" . $_->{website_url} . ">\n\n";
 
 
 =head1 DESCRIPTION
@@ -162,6 +166,15 @@ e.g. L<Acme::CPANModules> (the convention/standard), L<cpanmodules> (the CLI
 tool), etc.
 
 =back
+
+
+=head1 CONFIGURATION
+
+=head2 entry_description_code
+
+Optional. Perl code to produce the description POD. If not specified, will use
+default template for the description POD, i.e. entry's C<description> property,
+plus C<rating>, C<alternative_modules> if available.
 
 
 =head1 SEE ALSO
