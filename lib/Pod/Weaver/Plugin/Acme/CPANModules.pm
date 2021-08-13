@@ -133,6 +133,81 @@ are found.
     $self->log(["Generated POD for '%s'", $filename]);
 }
 
+sub _process_bundle_module {
+    no strict 'refs';
+
+    my ($self, $document, $input, $package) = @_;
+
+    my $filename = $input->{filename};
+
+    # XXX handle dynamically generated module (if there is such thing in the
+    # future)
+    local @INC = ("lib", @INC);
+
+    # collect modules list
+    my %acs;
+    {
+        require Module::List;
+        my $res;
+        {
+            local @INC = ("lib");
+            $res = Module::List::list_modules(
+                "Acme::CPANModules::", {recurse=>1, list_modules=>1});
+        }
+        for my $mod (keys %$res) {
+            my $ac_name = $mod; $ac_name =~ s/^Acme::CPANModules:://;
+            local @INC = ("lib", @INC);
+            my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
+            require $mod_pm;
+            $acs{$ac_name} = ${"$mod\::LIST"};
+        }
+    }
+
+    # add POD section: ACME::CPANMODULES MODULES
+    {
+        last unless keys %acs;
+        require Markdown::To::POD;
+        my @pod;
+        push @pod, "The following Acme::CPANModules::* modules are included in this distribution:\n\n";
+
+        push @pod, "=over\n\n";
+        for my $name (sort keys %acs) {
+            my $list = $acs{$name};
+            push @pod, "=item * L<$name|Acme::CPANModules::$name>\n\n";
+            if (defined $list->{summary}) {
+                require String::PodQuote;
+                push @pod, String::PodQuote::pod_quote($list->{summary}), ".\n\n";
+            }
+            if ($list->{description}) {
+                my $pod = Markdown::To::POD::markdown_to_pod(
+                    $list->{description});
+                push @pod, $pod, "\n\n";
+            }
+        }
+        push @pod, "=back\n\n";
+        $self->add_text_to_section(
+            $document, join("", @pod), 'ACME::CPANMODULES MODULES',
+            {after_section => ['DESCRIPTION']},
+        );
+    }
+
+    # add POD section: SEE ALSO
+    {
+        # XXX don't add if current See Also already mentions it
+        my @pod = (
+            "L<Acme::CPANModules> - the specification\n\n",
+            "L<App::cpanmodules> - the main CLI\n\n",
+            "L<App::CPANModulesUtils> - other CLIs\n\n",
+        );
+        $self->add_text_to_section(
+            $document, join('', @pod), 'SEE ALSO',
+            {after_section => ['DESCRIPTION']},
+        );
+    }
+
+    $self->log(["Generated POD for '%s'", $filename]);
+}
+
 sub weave_section {
     my ($self, $document, $input) = @_;
 
@@ -141,8 +216,11 @@ sub weave_section {
     return unless $filename =~ m!^lib/(.+)\.pm$!;
     my $package = $1;
     $package =~ s!/!::!g;
-    return unless $package =~ /\AAcme::CPANModules::/;
-    $self->_process_module($document, $input, $package);
+    if ($package =~ /\AAcme::CPANModules::/) {
+        $self->_process_module($document, $input, $package);
+    } elsif ($package =~ /\AAcme::CPANModulesBundle::/) {
+        $self->_process_bundle_module($document, $input, $package);
+    }
 }
 
 1;
@@ -162,6 +240,16 @@ In your F<weaver.ini>:
 
 This plugin is used when building Acme::CPANModules::* distributions. It
 currently does the following:
+
+For F<Acme/CPANModulesBundle/*.pm> files:
+
+=over
+
+=item * List Acme::CPANModules::* modules included in the distribution
+
+=back
+
+For F<Acme/CPANModules/*.pm> files:
 
 =over
 
