@@ -253,7 +253,9 @@ For F<Acme/CPANModules/*.pm> files:
 
 =over
 
-=item * Create "MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE" POD section from the list
+=item * Create "ACME::CPANMODULES ENTRIES" POD section from the list
+
+=item * Create "ACME::CPANMODULES FEATURE COMPARISON MATRIX" POD section from the list
 
 =item * Mention some modules in See Also section
 
