@@ -1,10 +1,5 @@
 package Pod::Weaver::Plugin::Acme::CPANModules;
 
-# AUTHORITY
-# DATE
-# DIST
-# VERSION
-
 use 5.010001;
 use Moose;
 with 'Pod::Weaver::Role::AddTextToSection';
@@ -13,6 +8,11 @@ with 'Pod::Weaver::Role::Section';
 has entry_description_code => (is=>'rw');
 
 use Pod::From::Acme::CPANModules qw(gen_pod_from_acme_cpanmodules);
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
 
 sub _process_module {
     no strict 'refs';
