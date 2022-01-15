@@ -6,6 +6,11 @@ with 'Pod::Weaver::Role::AddTextToSection';
 with 'Pod::Weaver::Role::Section';
 
 has entry_description_code => (is=>'rw');
+has additional_props => (is=>'rw');
+
+sub mvp_multivalue_args { qw(
+                                additional_props
+                        ) }
 
 use Pod::From::Acme::CPANModules qw(gen_pod_from_acme_cpanmodules);
 
@@ -48,6 +53,7 @@ sub _process_module {
         module => $package,
         _raw=>1,
         ($self->entry_description_code ? (entry_description_code => $self->entry_description_code) : ()),
+        ($self->additional_props ? (additional_props => $self->additional_props) : ()),
     );
 
     for my $section (sort keys %{$res->{pod}}) {
@@ -271,7 +277,12 @@ tool), etc.
 
 Optional. Perl code to produce the description POD. If not specified, will use
 default template for the description POD, i.e. entry's C<description> property,
-plus C<rating>, C<alternative_modules> if available.
+plus C<rating>, C<alternative_modules> if available. See
+L<Pod::From::Acme::CPANModules> for more details.
+
+=head2 additional_props
+
+Optional. Also passed to C<Pod::From::Acme::CPANModules>.
 
 
 =head1 SEE ALSO
